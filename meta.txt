@@ -1,0 +1,7 @@
+mode test_model
+discriminator test_discrim
+generator test_gen 
+dwidth 299
+dheight 299
+epochs 5
+batches 10
