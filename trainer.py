@@ -7,6 +7,7 @@ from typing import Dict
 from tqdm import tqdm
 import os, time, datetime
 from generic import Discriminator, Generator
+import random
 
 class Trainer():
     def __init__(self,
@@ -15,6 +16,7 @@ class Trainer():
                  disc: Discriminator,
                  loss_fn,
                  optimizer,
+                 real_fake_threshold: float,
                  steps_per_checkpoint: int,
                  save_path: str,
                  save_name: str,
@@ -26,6 +28,7 @@ class Trainer():
         self.steps = steps
         self.loss_fn = loss_fn
         self.optimizer = optimizer
+        self.threshold = real_fake_threshold
 
         # Model Params
         self.generator = gen
@@ -108,7 +111,16 @@ class Trainer():
                         [batch[k].cuda() for k in batch.keys()]
                     [batch[k].to(self.device) for k in batch.keys()]
 
-                    loss = self.creiterion(self._train_step(batch), labels)
+                    # TODO: define a real and a fake generator sequence
+                    # Check if we will be using real or generated data
+                    if random.random() > self.threshold:
+
+
+                    # TODO: define a discriminator sequence      
+
+
+                    # TODO: Append how this loss function works
+                    loss = self.loss_fn(self._train_step(batch), labels)
                     loss.backward()
                     self.optimizer.step()
 
