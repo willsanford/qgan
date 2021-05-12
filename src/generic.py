@@ -33,5 +33,9 @@ class Generator(nn.Module):
     def forward(self, inputs):
         return self.forward_pass(inputs)
 
-    def real_ouput(self):
+    def real_ouput(self, inputs: Dict[str, torch.tensor]):
         raise NotImplementedError
+
+# TODO: Create a generic model for a single class that houses a discriminator
+# This will save time in not having to write a single generic cost loop
+# Will also allow for more flexability in testing strange cost functions

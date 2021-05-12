@@ -12,10 +12,8 @@ import random
 class Trainer():
     def __init__(self,
                  steps: int,
-                 gen: Generator,
-                 disc: Discriminator,
-                 loss_fn,
-                 optimizer,
+                 model,
+                 gen_optimizer,
                  real_fake_threshold: float,
                  steps_per_checkpoint: int,
                  save_path: str,
@@ -26,13 +24,11 @@ class Trainer():
 
         # Training parameters
         self.steps = steps
-        self.loss_fn = loss_fn
-        self.optimizer = optimizer
+        self.gen_optimizer = gen_optimizer
         self.threshold = real_fake_threshold
 
         # Model Params
-        self.generator = gen
-        self.discriminator = disc
+        self.model = model
 
         # Check accelerator compatability and send the network to the compatible device
         self.device = self._check_cuda(cuda)
@@ -111,18 +107,10 @@ class Trainer():
                         [batch[k].cuda() for k in batch.keys()]
                     [batch[k].to(self.device) for k in batch.keys()]
 
-                    # TODO: define a real and a fake generator sequence
                     # Check if we will be using real or generated data
-                    if random.random() > self.threshold:
 
-
-                    # TODO: define a discriminator sequence      
-
-
-                    # TODO: Append how this loss function works
-                    loss = self.loss_fn(self._train_step(batch), labels)
-                    loss.backward()
-                    self.optimizer.step()
+                    # TODO: Moved the logic that was here to inside the model class. rewrite what was here to reflect 
+                    # d_loss, g_loss = self.model.step()
 
                     t.set_description('Step: %6d Epoch: %4d Batch: %4d Loss: %.3f' %(step + 1, epoch, batch_num, loss.item()))
 
