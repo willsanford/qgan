@@ -1,9 +1,19 @@
-mode train_model
+# General Information
+modes train_model/visualize
+run_name test
+
+# Logging Info
+log_file_name log
+include ERR/LOG/TRN
+log_out 1
+
+# Model
 model basic_q
+
+# Training Information
 steps 100
 rf_threshold 0.5
 epochs 10
-steps_per_checkpoint 2
 save_path result/test
 save_name test
 load_name Null

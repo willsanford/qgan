@@ -17,7 +17,7 @@
 #     '''
 
 from datetime import date, datetime
-
+from typing import Tuple
 def load_meta(file):
     '''
     Load the information from the file 'meta.txt' and return a dictionry with the corresponding metadata and its values
@@ -30,10 +30,24 @@ def load_meta(file):
     f = open(file, 'r')
     out = {}
     for line in f.readlines():
-        s = line.strip().split(' ')
-        out[s[0]] = s[1]
+        # Ignore comments and blank lines
+        if line[0] != '#' and len(line) != 1:
+            s = line.strip().split(' ')
+            out[s[0]] = s[1]
     f.close()
     return out
 
-def log(type, msg):
-    print(f'{datetime.now()} | {type} | {msg}')
+
+def visualize_losses(save_path: str,
+                     losses = Tuple):
+    '''
+    Takes a tuple of losses (gen and disc) and saves matpolotlib image
+
+    Args: 
+        save_path: path to save visualizations to 
+        losses: tuple of lists of gen and disc losses
+    Returns:
+        None
+    '''
+    # Unpack tuple
+    g_losses, d_losses = losses

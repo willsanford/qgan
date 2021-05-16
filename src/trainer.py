@@ -2,20 +2,17 @@
 # Trainer
 #
 import torch
-
-from typing import Dict
 from tqdm import tqdm
 import os, time, datetime
-from common import log
-import random
+from logger import Logger
 
 class Trainer():
     def __init__(self,
                  steps: int,
                  model,
+				 logger: Logger,
                  real_fake_threshold: float,
                  epochs: int,
-                 steps_per_checkpoint: int,
                  save_path: str,
                  save_name: str,
                  load_name: str = 'Null',
@@ -29,15 +26,21 @@ class Trainer():
         # Model Params
         self.model = model
 
+        # Logger
+        self.l = logger
+
         # Check accelerator compatability and send the network to the compatible device
         self.device = self._check_cuda(cuda)
-        log('LOG', f'Trainer loaded using device: {torch.cuda.get_device_name(device=self.device)}')
+        self.l.log('LOG', f'Trainer loaded using device: {torch.cuda.get_device_name(device=self.device)}')
 
         # Model check point parameters
-        self.spc = steps_per_checkpoint
         self.save_name = save_name
         self.save_path = save_path
         self.load_name = load_name
+
+		# Save model losses
+        self.g_loss = []
+        self.d_loss = []
 
     def _check_cuda(self, cuda: bool) -> str:
         '''
@@ -56,7 +59,9 @@ class Trainer():
         else:
             return 'cuda:0'
 
-    # TODO: ADD LOGGING HERE
+    def get_losses(self):
+        return self.g_loss, self.d_loss
+        
     def _load_ckpt(self):
       '''
       If a load path is given, load the most recent iteration of the model
@@ -78,19 +83,24 @@ class Trainer():
         start_time = time.time()        
         epoch = 0
         
-        log('LOG', 'Training started')
+        self.l.log('LOG', 'Training started')
         while epoch < self.epochs:
             epoch += 1
             step = 0
-            log('LOG', f'Starting epoch: {epoch}')
+            self.l.log('LOG', f'Starting epoch: {epoch}')
             while step < self.steps:
                 step +=1
                 d_loss, g_loss = self.model.step()
-                log('TRN', 'Epoch: %3d Step: %4d  Gen Loss: %.4f  Disc Loss: %.4f' %(epoch, step, g_loss, d_loss))
+                self.g_loss.append(g_loss), self.d_loss.append(d_loss)
+                self.l.log('TRN', 'Epoch: %3d Step: %4d  Gen Loss: %.4f  Disc Loss: %.4f' %(epoch, step, g_loss, d_loss))
 
-                        # Save the model dictionary in the path {save_path}/{save_name}_{step number}
-                        # TODO: Log this properly 
-                        # if step % self.spc == 0:
-                        #     torch.save(self.net, os.path.join(self.save_path, self.save_name + '_' +  str(step)))
+			# Save the model dictionary in the path {save_path}/{save_name}_{g|d}{epoch}
+            g = self.model.save_checkpoint('gen', os.path.join(self.save_path, self.save_name + 'g' + str(epoch)))
+            d = self.model.save_checkpoint('disc', os.path.join(self.save_path, self.save_name + 'd' + str(epoch)))
+            if g and d:
+                self.l.log('TRN', f'Weights logged for epoch {epoch}')
+            else:
+                self.l.log('ERR', 'Couldn\'t save checkpoint')
+			
               
-        log('LOG', f'Training has finished. Completed in {datetime.timedelta(seconds=(time.time() - start_time))}.')
+        self.l.log('LOG', f'Training has finished. Completed in {datetime.timedelta(seconds=(time.time() - start_time))}.')

@@ -1,3 +1,4 @@
+from warnings import catch_warnings
 from pennylane.ops.qubit import PauliZ
 from pkg_resources import parse_requirements
 import torch
@@ -15,64 +16,6 @@ phi = np.pi / 6
 theta = np.pi / 2
 omega = np.pi / 7
 eps = 1e-2 
-
-
-# TODO: make the generic version of this system work like the single class version does
-# class qDisc(Discriminator):
-#     def __init__(self):
-#         super().__init__('Basic Quantum Disciminator')
-
-#     @qml.qnode(dev, interface='torch')
-#     def forward_pass(self, inputs: Dict[str, torch.tensor]) -> Dict[str, torch.tensor]:
-
-#         weights = inputs['disc_weights']
-
-#         qml.Hadamard(wires=0)
-#         qml.RX(weights[0], wires=0)
-#         qml.RX(weights[1], wires=2)
-#         qml.RY(weights[2], wires=0)
-#         qml.RY(weights[3], wires=2)
-#         qml.RZ(weights[4], wires=0)
-#         qml.RZ(weights[5], wires=2)
-#         qml.CNOT(wires=[0, 2])
-#         qml.RX(weights[6], wires=2)
-#         qml.RY(weights[7], wires=2)
-#         qml.RZ(weights[8], wires=2)
-
-#         return {
-#             'disc_out': qml.expval(qml.PauliZ(2))
-#         }
-
-
-# class qGen(Generator):
-#     def __init__(self):
-#         super().__init__('Basic Quantum Generator')     
-        
-#     @qml.qnode(dev, interface='torch')
-#     def forward_pass(self, inputs: Dict[str, torch.tensor]) -> Dict[str, torch.tensor]:
-
-#         weights = inputs['gen_weights']
-
-#         qml.Hadamard(wires=0)
-#         qml.RX(weights[0], wires=0)
-#         qml.RX(weights[1], wires=1)
-#         qml.RY(weights[2], wires=0)
-#         qml.RY(weights[3], wires=1)
-#         qml.RZ(weights[4], wires=0)
-#         qml.RZ(weights[5], wires=1)
-#         qml.CNOT(wires=[0, 1])
-#         qml.RX(weights[6], wires=0)
-#         qml.RY(weights[7], wires=0)
-#         qml.RZ(weights[8], wires=0)
-
-#         return {}
-
-
-#     def real_output(inputs: Dict[str, torch.tensor]):
-#         angles = inputs['angles']
-
-#         qml.Hadamard(wires=0)
-#         qml.Rot(*angles, wires=0)
 
 class InitialQuantumModel:
     def __init__(self):
@@ -157,3 +100,15 @@ class InitialQuantumModel:
         self.d_optimizer.step()
 
         return disc_loss.item(), gen_loss.item()
+
+    def save_checkpoint(self, model, path):
+        try:
+            if model == 'gen':
+                torch.save(self.g_weights, path)
+            else:
+                torch.save(self.d_weights, path)
+        except:
+            return False
+        else:
+            return True
+        
