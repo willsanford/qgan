@@ -97,7 +97,7 @@ class InitialQuantumModel():
             qml.Hadamard(wires=0)
             qml.Rot(*angles, wires=0)
 
-        def gen(self, weights):
+        def gen(weights):
             qml.Hadamard(wires=0)
             qml.RX(weights[0], wires=0)
             qml.RX(weights[1], wires=1)
@@ -110,7 +110,7 @@ class InitialQuantumModel():
             qml.RY(weights[7], wires=0)
             qml.RZ(weights[8], wires=0)
         
-        def discrim(self, weights):
+        def discrim(weights):
             qml.Hadamard(wires=0)
             qml.RX(weights[0], wires=0)
             qml.RX(weights[1], wires=2)

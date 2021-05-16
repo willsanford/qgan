@@ -13,7 +13,6 @@ class Trainer():
     def __init__(self,
                  steps: int,
                  model,
-                 gen_optimizer,
                  real_fake_threshold: float,
                  steps_per_checkpoint: int,
                  save_path: str,
@@ -24,7 +23,6 @@ class Trainer():
 
         # Training parameters
         self.steps = steps
-        self.gen_optimizer = gen_optimizer
         self.threshold = real_fake_threshold
 
         # Model Params
@@ -57,9 +55,10 @@ class Trainer():
         else:
             return 'cuda:0'
 
+    # TODO: This funcitonality was moved into the models. This can likely be removed
     def _train_step(self, inputs: Dict[str, torch.tensor]) -> torch.tensor:
         '''
-          Runs a single training step a single batch of inputs. Will run the generator
+          Runs a single training step a single batch of inputs. 
 
           Args:
             inputs: This is a dictionary of the inputs of the given DAG. This should match the naming scheme of the defined DAG
@@ -112,7 +111,7 @@ class Trainer():
                     # TODO: Moved the logic that was here to inside the model class. rewrite what was here to reflect 
                     # d_loss, g_loss = self.model.step()
 
-                    t.set_description('Step: %6d Epoch: %4d Batch: %4d Loss: %.3f' %(step + 1, epoch, batch_num, loss.item()))
+                    t.set_description('Step: %6d Epoch: %4d Batch: %4d Loss: %.3f' %(step + 1, epoch, batch_num, loss))
 
                     step +=1
 
