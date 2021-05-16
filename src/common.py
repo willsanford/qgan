@@ -16,7 +16,9 @@
 #         return value : short desc
 #     '''
 
-def load_meta():
+from datetime import date, datetime
+
+def load_meta(file):
     '''
     Load the information from the file 'meta.txt' and return a dictionry with the corresponding metadata and its values
 
@@ -25,7 +27,7 @@ def load_meta():
     Returns:
         Dict[str,str]: a dictionary of the meta parameters
     '''
-    f = open('meta.txt', 'r')
+    f = open(file, 'r')
     out = {}
     for line in f.readlines():
         s = line.strip().split(' ')
@@ -33,4 +35,5 @@ def load_meta():
     f.close()
     return out
 
-
+def log(type, msg):
+    print(f'{datetime.now()} | {type} | {msg}')

@@ -73,7 +73,7 @@ eps = 1e-2
 #         qml.Hadamard(wires=0)
 #         qml.Rot(*angles, wires=0)
 
-class InitialQuantumModel():
+class InitialQuantumModel:
     def __init__(self, gen_optimizer, disc_optimizer):
         # Set generator architecture
         # self.gen = qDisc()

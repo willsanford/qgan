@@ -1,5 +1,0 @@
-mode test_model
-discriminator test_discrim
-generator test_gen 
-epochs 5
-batches 10

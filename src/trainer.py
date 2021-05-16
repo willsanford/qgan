@@ -6,7 +6,7 @@ import torch
 from typing import Dict
 from tqdm import tqdm
 import os, time, datetime
-from generic import Discriminator, Generator
+from common import log
 import random
 
 class Trainer():
@@ -17,7 +17,6 @@ class Trainer():
                  steps_per_checkpoint: int,
                  save_path: str,
                  save_name: str,
-                 data_path: str,
                  load_name: str = 'Null',
                  cuda: bool = True):
 
@@ -30,7 +29,7 @@ class Trainer():
 
         # Check accelerator compatability and send the network to the compatible device
         self.device = self._check_cuda(cuda)
-        self.net.to(self.device)
+        log('LOG', f'Trainer loaded using device: {torch.cuda.get_device_name(device=self.device)}')
 
         # Model check point parameters
         self.spc = steps_per_checkpoint
@@ -50,7 +49,7 @@ class Trainer():
         '''
         if not cuda:
             return 'cpu'
-        elif not torch.cuda.is_availble():
+        elif not torch.cuda.is_available():
             raise Exception('You claim to have a CUDA enabled device, but pytorch cannot find it')
         else:
             return 'cuda:0'
@@ -77,13 +76,11 @@ class Trainer():
         latest_ckpt = sorted(ckpt, key= lambda fname: int(fname.split('_')[1]))[0]
         self.net.load_state_dict(torch.load(os.path.join(self.load_path, latest_ckpt)))    
 
-    def train(self, dataloader):
+    def train(self):
         '''
         This function handles all of training logic.
 
         Args: 
-          dataloader This should a preloaded pytorch dataloader
-
         '''
         self._load_ckpt()
         
@@ -91,32 +88,36 @@ class Trainer():
         epoch = 0
         step = 0
 
+        log('LOG', 'Training started')
+
         while step < self.steps:
             epoch += 1
-            print(f'Starting Epoch {epoch}')
+            log('LOG', f'Starting Epoch {epoch}')
+            step +=1
+            print(self.model)
+            d_loss, g_loss = self.model.step()
+            log('LOG', f'STEP: {step}')
 
-            with tqdm(enumerate(dataloader)) as t:
-                for batch_num, batch_tuple in t:
-                    batch, labels = batch_tuple
 
-                    self.optimizer.zero_grad()
-
-                    # Cuda enable any input tensors if using a cuda device and then send all the data to the proper device
-                    if self.device != 'cpu':
-                        [batch[k].cuda() for k in batch.keys()]
-                    [batch[k].to(self.device) for k in batch.keys()]
+            # with tqdm(enumerate(dataloader)) as t:
+            #     for batch_num, batch_tuple in t:
+            #         batch, labels = batch_tuple
+            #         # Cuda enable any input tensors if using a cuda device and then send all the data to the proper device
+            #         if self.device != 'cpu':
+            #             [batch[k].cuda() for k in batch.keys()]
+            #         [batch[k].to(self.device) for k in batch.keys()]
 
                     # Check if we will be using real or generated data
 
                     # TODO: Moved the logic that was here to inside the model class. rewrite what was here to reflect 
-                    # d_loss, g_loss = self.model.step()
 
-                    t.set_description('Step: %6d Epoch: %4d Batch: %4d Loss: %.3f' %(step + 1, epoch, batch_num, loss))
+                    #  t.set_description('Step: %6d Epoch: %4d Batch: %4d Loss: %.3f' %(step + 1, epoch, batch_num, loss))
 
-                    step +=1
+                    
 
                     # Save the model dictionary in the path {save_path}/{save_name}_{step number}
-                    if step % self.spc == 0:
-                        torch.save(self.net, os.path.join(self.save_path, self.save_name + '_' +  str(step)))
+                    # TODO: Log this properly 
+                    # if step % self.spc == 0:
+                    #     torch.save(self.net, os.path.join(self.save_path, self.save_name + '_' +  str(step)))
           
-        print(f'Training has finished. Completed in {datetime.timedelta(seconds=(time.time() - start_time))}.')
+        log('LOG', f'Training has finished. Completed in {datetime.timedelta(seconds=(time.time() - start_time))}.')
