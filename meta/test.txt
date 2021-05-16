@@ -1,7 +1,8 @@
 mode train_model
 model basic_q
-steps 10
+steps 100
 rf_threshold 0.5
+epochs 10
 steps_per_checkpoint 2
 save_path result/test
 save_name test

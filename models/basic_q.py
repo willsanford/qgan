@@ -1,4 +1,5 @@
 from pennylane.ops.qubit import PauliZ
+from pkg_resources import parse_requirements
 import torch
 from torch import nn 
 import numpy as np
@@ -74,15 +75,13 @@ eps = 1e-2
 #         qml.Rot(*angles, wires=0)
 
 class InitialQuantumModel:
-    def __init__(self, gen_optimizer, disc_optimizer):
+    def __init__(self):
         # Set generator architecture
-        # self.gen = qDisc()
-        self.g_optimizer = gen_optimizer
-        self.g_weights = np.array([np.pi] + [0] * 8) + np.random.normal(scale=eps, size=(9,))
+        self.g_weights = torch.tensor(np.array([np.pi] + [0] * 8) + np.random.normal(scale=eps, size=(9,)), requires_grad=True)
+        self.g_optimizer = torch.optim.Adam([self.g_weights], lr=0.1)
 
-        # self.disc = qDisc()
-        self.d_optimizer = disc_optimizer
-        self.d_weights = np.random.normal(size=(9,))
+        self.d_weights = torch.tensor(np.random.normal(size=(9,)), requires_grad=True)
+        self.d_optimizer = torch.optim.Adam([self.d_weights], lr=0.1)
 
     def step(self):
         # Define a device for PennyLane syntax
@@ -142,8 +141,8 @@ class InitialQuantumModel:
         real_given_fake = lambda gen_weights, disc_weights: (disc_gen(gen_weights, disc_weights) + 1) / 2
 
         # We only want one weight to be learned in each, so one will be a static .self variable
-        disc_cost = lambda disc_weights: real_given_fake(self.gen_weights, disc_weights) - real_given_real(disc_weights)
-        gen_cost = lambda gen_weights: -real_given_fake(gen_weights, self.disc_weights)
+        disc_cost = lambda disc_weights: real_given_fake(self.g_weights, disc_weights) - real_given_real(disc_weights)
+        gen_cost = lambda gen_weights: -real_given_fake(gen_weights, self.d_weights)
 
         # Train the generator
         self.g_optimizer.zero_grad()

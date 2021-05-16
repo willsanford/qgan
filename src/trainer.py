@@ -14,6 +14,7 @@ class Trainer():
                  steps: int,
                  model,
                  real_fake_threshold: float,
+                 epochs: int,
                  steps_per_checkpoint: int,
                  save_path: str,
                  save_name: str,
@@ -22,6 +23,7 @@ class Trainer():
 
         # Training parameters
         self.steps = steps
+        self.epochs = epochs
         self.threshold = real_fake_threshold
 
         # Model Params
@@ -54,19 +56,7 @@ class Trainer():
         else:
             return 'cuda:0'
 
-    # TODO: This funcitonality was moved into the models. This can likely be removed
-    def _train_step(self, inputs: Dict[str, torch.tensor]) -> torch.tensor:
-        '''
-          Runs a single training step a single batch of inputs. 
-
-          Args:
-            inputs: This is a dictionary of the inputs of the given DAG. This should match the naming scheme of the defined DAG
-
-          Returns:
-            loss: returns outputs of the network run
-        '''
-        return self.net(inputs)
-    
+    # TODO: ADD LOGGING HERE
     def _load_ckpt(self):
       '''
       If a load path is given, load the most recent iteration of the model
@@ -75,7 +65,8 @@ class Trainer():
         ckpt = os.listdir(self.save_path)
         latest_ckpt = sorted(ckpt, key= lambda fname: int(fname.split('_')[1]))[0]
         self.net.load_state_dict(torch.load(os.path.join(self.load_path, latest_ckpt)))    
-
+      else:
+        pass
     def train(self):
         '''
         This function handles all of training logic.
@@ -86,38 +77,20 @@ class Trainer():
         
         start_time = time.time()        
         epoch = 0
-        step = 0
-
+        
         log('LOG', 'Training started')
-
-        while step < self.steps:
+        while epoch < self.epochs:
             epoch += 1
-            log('LOG', f'Starting Epoch {epoch}')
-            step +=1
-            print(self.model)
-            d_loss, g_loss = self.model.step()
-            log('LOG', f'STEP: {step}')
+            step = 0
+            log('LOG', f'Starting epoch: {epoch}')
+            while step < self.steps:
+                step +=1
+                d_loss, g_loss = self.model.step()
+                log('TRN', 'Epoch: %3d Step: %4d  Gen Loss: %.4f  Disc Loss: %.4f' %(epoch, step, g_loss, d_loss))
 
-
-            # with tqdm(enumerate(dataloader)) as t:
-            #     for batch_num, batch_tuple in t:
-            #         batch, labels = batch_tuple
-            #         # Cuda enable any input tensors if using a cuda device and then send all the data to the proper device
-            #         if self.device != 'cpu':
-            #             [batch[k].cuda() for k in batch.keys()]
-            #         [batch[k].to(self.device) for k in batch.keys()]
-
-                    # Check if we will be using real or generated data
-
-                    # TODO: Moved the logic that was here to inside the model class. rewrite what was here to reflect 
-
-                    #  t.set_description('Step: %6d Epoch: %4d Batch: %4d Loss: %.3f' %(step + 1, epoch, batch_num, loss))
-
-                    
-
-                    # Save the model dictionary in the path {save_path}/{save_name}_{step number}
-                    # TODO: Log this properly 
-                    # if step % self.spc == 0:
-                    #     torch.save(self.net, os.path.join(self.save_path, self.save_name + '_' +  str(step)))
-          
+                        # Save the model dictionary in the path {save_path}/{save_name}_{step number}
+                        # TODO: Log this properly 
+                        # if step % self.spc == 0:
+                        #     torch.save(self.net, os.path.join(self.save_path, self.save_name + '_' +  str(step)))
+              
         log('LOG', f'Training has finished. Completed in {datetime.timedelta(seconds=(time.time() - start_time))}.')

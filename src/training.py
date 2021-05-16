@@ -8,14 +8,7 @@ sys.path.append(parentdir)
 # General Imports
 from common import load_meta, log
 from trainer import Trainer
-
-# Model imports and Dictionary, Allows models to be loaded from meta file
-from models.basic_q import InitialQuantumModel
-from models.test_models import TestDisc, TestGen
-model_dic = {
-    'basic_q': InitialQuantumModel(None,None)
-}
-
+import torch.optim as optim
 
 # Check for proper meta file
 if len(sys.argv) != 2:
@@ -25,12 +18,19 @@ meta = load_meta(sys.argv[1])
 log('LOG', f'Meta loaded using file: {sys.argv[1]}')
 
 
+# Model imports and Dictionary, Allows models to be loaded from meta file
+from models.basic_q import InitialQuantumModel
+from models.test_models import TestDisc, TestGen
+model_dic = {
+    'basic_q': InitialQuantumModel()
+}
 
 # Set up the generic trainer
 trainer = Trainer(
     steps = int(meta['steps']),
     model = model_dic[meta['model']],
     real_fake_threshold = float(meta['rf_threshold']),
+    epochs = int(meta['epochs']),
     steps_per_checkpoint = int(meta['steps_per_checkpoint']),
     save_path = meta['save_path'],
     save_name = meta['save_name'],
