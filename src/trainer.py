@@ -72,6 +72,7 @@ class Trainer():
         self.net.load_state_dict(torch.load(os.path.join(self.load_path, latest_ckpt)))    
       else:
         pass
+    
     def train(self):
         '''
         This function handles all of training logic.

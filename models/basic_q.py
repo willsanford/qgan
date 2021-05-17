@@ -1,12 +1,7 @@
-from warnings import catch_warnings
-from pennylane.ops.qubit import PauliZ
-from pkg_resources import parse_requirements
 import torch
-from torch import nn 
 import numpy as np
 import pennylane as qml
-from generic import Discriminator, Generator
-from typing import Dict
+
 # This is a simple class that will test a quantum generator agaist quantum discriminator. The style of this architecture is similar
 # to the architeture defined in Pennylane's QGan tutorial. The data we are trying to 
 

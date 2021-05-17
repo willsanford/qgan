@@ -18,6 +18,9 @@
 
 from datetime import date, datetime
 from typing import Tuple
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
 
 def load_meta(file):
     '''
@@ -38,7 +41,7 @@ def load_meta(file):
     f.close()
     return out
 
-def get_model(name: str):
+def get_model(name: str, logger=None, device=None):
     '''
     Initialize a given model from a string without having to load each on into a dictionary
     Args: 
@@ -55,6 +58,9 @@ def get_model(name: str):
     elif name == 'generic_d':
         from models.test_models import Discriminator
         return Discriminator()
+    elif name == 'mnist_classical':
+        from models.mnist_classical import MnistClassical
+        return MnistClassical(logger,device)
 
     
 def visualize_losses(save_path: str,
@@ -70,12 +76,12 @@ def visualize_losses(save_path: str,
     '''
     # Unpack tuple
     g_losses, d_losses = losses
+    x_values = range(len(g_losses))
+    plt.plot(x_values, g_losses, label = 'gen')
+    plt.plot(x_values, d_losses, label = 'disc')
+    plt.legend()
+    plt.show()
 
 
-
-# Model imports and Dictionary, Allows models to be loaded from meta file
-from models.basic_q import InitialQuantumModel
-from models.test_models import TestDisc, TestGen
-model_dic = {
-    'basic_q': InitialQuantumModel()
-}
+def get_cuda():
+    return torch.device('cuda' if torch.cuda.is_available() else 'cpu')

@@ -1,6 +1,6 @@
 # General Information
 modes train_model/visualize
-run_name test
+run_name mnist_classical
 
 # Logging Info
 log_file_name log
@@ -11,9 +11,9 @@ log_out 1
 model basic_q
 
 # Training Information
-steps 100
+steps 50
 rf_threshold 0.5
-epochs 10
+epochs 2
 save_path result/test
 save_name test
 load_name Null
