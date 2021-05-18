@@ -11,7 +11,6 @@ class Trainer():
                  steps: int,
                  model,
 				 logger: Logger,
-                 real_fake_threshold: float,
                  epochs: int,
                  save_path: str,
                  save_name: str,
@@ -21,7 +20,6 @@ class Trainer():
         # Training parameters
         self.steps = steps
         self.epochs = epochs
-        self.threshold = real_fake_threshold
 
         # Model Params
         self.model = model

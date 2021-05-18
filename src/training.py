@@ -40,7 +40,6 @@ trainer = Trainer(
     steps = int(meta['steps']),
     model = lib.get_model(meta['model'], l, device),
     logger = l,
-    real_fake_threshold = float(meta['rf_threshold']),
     epochs = int(meta['epochs']),
     save_path = meta['save_path'],
     save_name = meta['save_name'],

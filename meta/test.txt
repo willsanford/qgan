@@ -8,11 +8,10 @@ include ERR/LOG/TRN
 log_out 1
 
 # Model
-model basic_q
+model mnist_classical
 
 # Training Information
 steps 50
-rf_threshold 0.5
 epochs 2
 save_path result/test
 save_name test
