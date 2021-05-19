@@ -1,0 +1,19 @@
+# General Information
+modes train_model/visualize
+run_name basic_q
+
+# Logging Info
+log_file_name log
+include ERR/LOG/TRN
+log_out 1
+
+# Model
+model basic_q
+
+# Training Information
+steps 50
+epochs 2
+save_path result/basic_q_test
+save_name test
+load_name Null
+cuda 1

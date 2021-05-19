@@ -53,4 +53,5 @@ modes = meta['modes'].split('/')
 if 'train_model' in modes:
     trainer.train()
 if 'visualize' in modes:
+    print('got here')
     lib.visualize_losses(os.path.join('results', meta['run_name']), trainer.get_losses())

@@ -80,6 +80,7 @@ def visualize_losses(save_path: str,
     plt.plot(x_values, g_losses, label = 'gen')
     plt.plot(x_values, d_losses, label = 'disc')
     plt.legend()
+    plt.savefig(save_path)
     plt.show()
 
 
